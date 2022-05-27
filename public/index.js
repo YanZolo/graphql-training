@@ -1,42 +1,45 @@
 const selectAuthors = document.getElementById('selectAuthor');
-const listBooks = document.getElementById("ul-books")
+const listAuthorsBooks = document.getElementById("ul-books")
 
 selectAuthors.addEventListener("change", async (e) => {
   const authorId = e.target.value
-  const data = await getAuthorBooks(authorId)
-  const authorBooks = data.data.author.books
-  listBooks.innerHTML = ""
+  const authorBooks = await getAuthorBooks(authorId)
+  listAuthorsBooks.innerHTML = ""
   authorBooks.forEach(book => {
 
     const list = document.createElement("li")
     const bookName = book.name
     list.innerText = bookName
-    listBooks.append(list)
+    listAuthorsBooks.append(list)
   })
 
 
 
 })
 
-function getAuthorBooks(id) {
+function getAuthorBooks(authorId) {
   return queryFetch(`
-  query{
-    author(id: ${id}){
+  query getBooks($id: String){
+    author(id: $id){
       books{
         name
       }
     }
   }  
-`)
+`, { id: authorId })
+    .then(data => {
+      return data.data.author.books
+    })
 }
 
 
-function queryFetch(query) {
+function queryFetch(query, variables) {
   return fetch("http://localhost:8888/query", {
     method: "POST",
     headers: { "Content-type": "application/json" },
     body: JSON.stringify({
-      query: query
+      query: query,
+      variables: variables
     })
   }).then(res => res.json())
 }
@@ -60,7 +63,6 @@ fetch('http://localhost:8888/query', {
     response.data.authors.forEach(author => {
       const option = document.createElement("option");
       option.value = author.id
-      option.name = author.name
       option.innerText = author.name
       selectAuthors.append(option)
     })

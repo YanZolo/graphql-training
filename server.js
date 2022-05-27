@@ -51,10 +51,10 @@ const rootQuery = new GraphQLObjectType({
             type: BookType,
             description: "single book",
             args: {
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
-                return books.find(book => book.id === args.id)
+                return books.find(book => book.id === +args.id)
             }
         },
         authors: {
@@ -66,10 +66,10 @@ const rootQuery = new GraphQLObjectType({
             type: AuthorType,
             description: "single author",
             args: {
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
-                return authors.find(author => author.id === args.id)
+                return authors.find(author => author.id === +args.id)
             }
         },
     })
@@ -84,10 +84,10 @@ const rootMutation = new GraphQLObjectType({
             description: "add a book",
             args: {
                 name: { type: GraphQLNonNull(GraphQLString) },
-                authorId: { type: GraphQLNonNull(GraphQLInt) }
+                authorId: { type: GraphQLNonNull(GraphQLString) }
             },
             resolve: (parent, args) => {
-                const book = { id: books.length + 1, name: args.name, authorId: args.authorId }
+                const book = { id: books.length + 1, name: args.name, authorId: +args.authorId }
                 books.push(book)
                 return book
             }
@@ -111,10 +111,10 @@ const rootMutation = new GraphQLObjectType({
                 name: {
                     type: GraphQLNonNull(GraphQLString)
                 },
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
-                const book = books.find(book => book.id === args.id);
+                const book = books.find(book => book.id === +args.id);
                 book.name = args.name;
                 return book
             }
@@ -126,10 +126,10 @@ const rootMutation = new GraphQLObjectType({
                 name: {
                     type: GraphQLNonNull(GraphQLString)
                 },
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
-                const author = authors.find(author => author.id === args.id);
+                const author = authors.find(author => author.id === +args.id);
                 author.name = args.name;
                 return author;
             }
@@ -139,11 +139,11 @@ const rootMutation = new GraphQLObjectType({
             description: "delete a book",
             args: {
                 id: {
-                    type: GraphQLInt
+                    type: GraphQLString
                 }
             },
             resolve: async (parent, args) => {
-                const book = books.find(book => book.id === args.id)
+                const book = books.find(book => book.id === +args.id)
                 const bookIndex = books.indexOf(book)
                 if (bookIndex === -1) {
                     throw new Error("Book with this id has not been found")
@@ -160,10 +160,10 @@ const rootMutation = new GraphQLObjectType({
             type: GraphQLBoolean,
             description: "delete an author",
             args: {
-                id: { type: GraphQLInt }
+                id: { type: GraphQLString }
             },
             resolve: async (parent, args) => {
-                const authorIndex = authors.indexOf(authors.find(author => author.id === args.id))
+                const authorIndex = authors.indexOf(authors.find(author => author.id === +args.id))
 
                 if (authorIndex === -1) {
                     throw new Error("Author with this id has not been found")
@@ -190,6 +190,7 @@ app.use("/query", graphqlHTTP({
 }))
 
 app.use(express.static("public"))
+
 
 
 app.listen(port, () => {
