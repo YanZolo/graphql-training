@@ -184,10 +184,13 @@ const schema = new GraphQLSchema({
     mutation: rootMutation
 })
 
-app.use("/graphql", graphqlHTTP({
+app.use("/query", graphqlHTTP({
     schema: schema,
-    graphiql: true
+    graphiql: false
 }))
+
+app.use(express.static("public"))
+
 
 app.listen(port, () => {
     console.log("server is listening at port:" + port);
